@@ -150,6 +150,28 @@ fullName = lens getter setter
           let userWithFirstName = set uFirstName (head $ words s) u
            in set uLastName (unwords . tail . words $ s) userWithFirstName
 
+-- 3.7 Data correction and maintaining invariants
+
+data Time = Time
+  { _hours :: Int
+  , _mins  :: Int
+  } deriving (Show)
+
+clamp :: Int -> Int -> Int -> Int
+clamp minVal maxVal a = min maxVal . max minVal $ a
+
+hours :: Lens' Time Int
+hours = lens getter setter
+  where getter (Time h _) = h
+        setter (Time _ m) newHours = Time (clamp 0 23 newHours) m
+
+mins :: Lens' Time Int
+mins = lens getter setter
+  where getter (Time _ m) = m
+        setter (Time h _) newMins = Time h (clamp 0 59 newMins)
+
+-- Theses a not lawful lenses as they do not obey the set/get law.
+
 main :: IO ()
 main = do
   putStrLn "Hello from Lenses.hs"
@@ -202,5 +224,7 @@ main = do
   print newUser'
   putStrLn $ "Users full name: " <> (show $ view fullName user)
   putStrLn $ "Setting a different full name on user: " <> (show $ set fullName "Johanna Tummasardottir" user)
-
+  let time = Time 3 10
+  putStrLn $ "Time: " <> show time
+  putStrLn $ "New time using our clamped lens: " <> (show $ set mins (-10) $ set hours 40 time)
 
