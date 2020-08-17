@@ -1,8 +1,11 @@
 { nixpkgs ? import ./nixpkgs.nix
-, compiler ? "default"
+, compiler ? "ghc865"
 , doBenchmark ? false }:
 let
   inherit (nixpkgs) pkgs;
+  githubTarball = owner: repo: rev:
+    builtins.fetchTarball { url = "https://github.com/${owner}/${repo}/archive/${rev}.tar.gz"; };
+  ghcide = (import (githubTarball "cachix" "ghcide-nix" "master") {})."ghcide-${compiler}";
   name = "lensBook";
   haskellPackages = pkgs.haskellPackages;
   variant = if doBenchmark
@@ -23,6 +26,7 @@ in
         cabal-install
         cabal2nix
         hindent
+        ghcide
         # # if you want to add some system lib like ncurses
         # # you could by writing it like:
         # pkgs.ncurses
