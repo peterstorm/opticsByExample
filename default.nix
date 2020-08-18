@@ -1,13 +1,11 @@
 { nixpkgs ? import ./nixpkgs.nix
-, compiler ? "ghc865"
+, compiler ? "ghc884"
 , doBenchmark ? false }:
 let
   inherit (nixpkgs) pkgs;
-  githubTarball = owner: repo: rev:
-    builtins.fetchTarball { url = "https://github.com/${owner}/${repo}/archive/${rev}.tar.gz"; };
-  ghcide = (import (githubTarball "cachix" "ghcide-nix" "master") {})."ghcide-${compiler}";
+  inherit (nixpkgs) unstable;
   name = "lensBook";
-  haskellPackages = pkgs.haskellPackages;
+  haskellPackages = unstable.haskell.packages.${compiler};
   variant = if doBenchmark
             then pkgs.haskell.lib.doBenchmark
             else pkgs.lib.id;
@@ -16,8 +14,6 @@ in
 {
   my_project = drv;
   shell = haskellPackages.shellFor {
-    # generate hoogle doc
-    withHoogle = true;
     packages = p: [drv];
     # packages dependencies (by default haskellPackages)
     buildInputs = with haskellPackages;
@@ -25,8 +21,7 @@ in
         ghcid
         cabal-install
         cabal2nix
-        hindent
-        ghcide
+        unstable.haskellPackages.haskell-language-server
         # # if you want to add some system lib like ncurses
         # # you could by writing it like:
         # pkgs.ncurses
