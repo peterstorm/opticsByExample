@@ -62,7 +62,7 @@ data Session = Session
   { _userId      :: UserId
   , _userName    :: UserName
   , _createdTime :: String
-  , _expiryTime  :: String 
+  , _expiryTime  :: String
   } deriving (Show, Eq)
 
 makeLenses ''Session
@@ -75,12 +75,12 @@ userInfo = lensProduct userId userName
 data Builder = Builder
   { _context :: [String]
   , _build   :: [ String ] -> String
-  } 
+  }
 
 builder :: Lens' Builder String
 builder = lens getter setter
   where getter (Builder c f) = f c
-        setter (Builder c f) newVal = 
+        setter (Builder c f) newVal =
           Builder c $ \c' ->
             if c' == c
                then newVal
@@ -98,7 +98,7 @@ makeLenses ''Temperature
 -- make our 'Murican colleagues able to understand this weird temperature
 
 celsiusToFahrenheit :: Float -> Float
-celsiusToFahrenheit c = (c * (9/5)) + 32
+celsiusToFahrenheit c = c * (9/5) + 32
 
 fahrenheitToCelsius :: Float -> Float
 fahrenheitToCelsius f = (f - 32) * (5/9)
@@ -114,7 +114,7 @@ fahrenheit = lens getter setter
 
 celsius :: Lens' Temperature Float
 celsius = lens getter setter
-  where getter = (subtract 273.15) . view kelvin
+  where getter = subtract 273.15 . view kelvin
         setter t c = set kelvin (c + 273.15) t
 
 -- all over previews code (with few modifications) still works as intended!
@@ -158,7 +158,7 @@ data Time = Time
   } deriving (Show)
 
 clamp :: Int -> Int -> Int -> Int
-clamp minVal maxVal a = min maxVal . max minVal $ a
+clamp minVal maxVal = min maxVal . max minVal
 
 hours :: Lens' Time Int
 hours = lens getter setter
@@ -202,29 +202,29 @@ main = do
   putStrLn "Temperature in celsius:"
   let temp = Temperature "Berlin" (7.0 + 273.15)
   print $ view celsius temp
-  putStrLn $ "Temperature in kelvin: " <> (show $ view kelvin temp)
+  putStrLn $ "Temperature in kelvin: " <> show (view kelvin temp)
   putStrLn "Set temperature to x degrees:"
   print $ set celsius 14.5 temp
   putStrLn "Bump the origional temp by 10 degrees:"
   print $ over celsius (+10) temp
   putStrLn "Viewing temperature in fahrenheit with the new fahrenheit lens:"
-  putStrLn $ "Temperature in celsius: " <> (show $ view celsius temp)
+  putStrLn $ "Temperature in celsius: " <> show (view celsius temp)
   print $ view fahrenheit temp
   putStrLn "Adding 18 to the amount of f to the temperature using over:"
-  putStrLn $ "Temperature in celsius: " <> (show $ view celsius temp)
+  putStrLn $ "Temperature in celsius: " <> show (view celsius temp)
   print $ over fahrenheit (+18) temp
   putStrLn "User virtual fields excersice:"
-  let user = User "Peter" "Hansen" "pkshdk@gmail.com" 
+  let user = User "Peter" "Hansen" "pkshdk@gmail.com"
   print user
-  putStrLn $ "Users username: " <> (show $ view uUsername user)
+  putStrLn $ "Users username: " <> show (view uUsername user)
   let newUser = set uUsername "johanna@gmail.com" user
   print newUser
-  putStrLn $ "Users username: " <> (show $ view uUsername' user)
+  putStrLn $ "Users username: " <> show (view uUsername' user)
   let newUser' = set uUsername' "johanna@gmail.com" user
   print newUser'
-  putStrLn $ "Users full name: " <> (show $ view fullName user)
-  putStrLn $ "Setting a different full name on user: " <> (show $ set fullName "Johanna Tummasardottir" user)
+  putStrLn $ "Users full name: " <> show (view fullName user)
+  putStrLn $ "Setting a different full name on user: " <> show (set fullName "Johanna Tummasardottir" user)
   let time = Time 3 10
   putStrLn $ "Time: " <> show time
-  putStrLn $ "New time using our clamped lens: " <> (show $ set mins (-10) $ set hours 40 time)
+  putStrLn $ "New time using our clamped lens: " <> show (set mins (-10) $ set hours 40 time)
 

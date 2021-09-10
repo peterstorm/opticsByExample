@@ -1,4 +1,10 @@
 cradle:
   cabal:
-    - path: "./app"
-      component: "exe:lensBook"
+    - path: "src"
+      component: "lib:lensBook"
+
+    - path: "app/Main.hs"
+      component: "lensBook:exe:lensBook"
+
+    - path: "test"
+      component: "lensBook:test:lensBook-test"

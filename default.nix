@@ -3,9 +3,8 @@
 , doBenchmark ? false }:
 let
   inherit (nixpkgs) pkgs;
-  inherit (nixpkgs) unstable;
   name = "lensBook";
-  haskellPackages = unstable.haskell.packages.${compiler};
+  haskellPackages = pkgs.haskell.packages.${compiler};
   variant = if doBenchmark
             then pkgs.haskell.lib.doBenchmark
             else pkgs.lib.id;
@@ -17,11 +16,12 @@ in
     packages = p: [drv];
     # packages dependencies (by default haskellPackages)
     buildInputs = with haskellPackages;
-      [ hlint
-        ghcid
+      [ 
+        hlint
         cabal-install
         cabal2nix
-        unstable.haskellPackages.haskell-language-server
+        haskell-language-server
+        implicit-hie
         # # if you want to add some system lib like ncurses
         # # you could by writing it like:
         # pkgs.ncurses
